@@ -2,7 +2,6 @@
 
 A modern fullstack Expense Tracker web application that allows users to sign up, log in, and manage their personal expenses by category, date, and amount — all in one clean, intuitive interface.
 
-![App Screenshot](./screenshots/landing.png) <!-- Optional: Replace with actual screenshot -->
 
 ---
 
