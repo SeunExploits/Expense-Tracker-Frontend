@@ -1,10 +1,11 @@
 import React from "react";
-import {IoCheckmarkDoneCircle} from "react-icons/ios";
+import {IoCheckmarkDoneCircle} from "react-icons/io5";
 import {RiProgress3Line} from "react-icons/ri";
-import {Tiwarning} from "react-icons/ri";
+
 import {Link} from "react-router-dom";
 import { formatCurrency } from "../libs";
 import Title from "./title";
+import { TiWarning } from "react-icons/ti";
 
 
 
@@ -66,7 +67,7 @@ const RecentTransactions = ({data}) => {
 
 
                                 {item?.status === "Rejected" && (
-                                    <Tiwarning className= "text-red-600" size = {24}/>
+                                    <TiWarning className= "text-red-600" size = {24}/>
                                 )}
                                 <span> {item?.status} </span>
                             </td>
@@ -83,3 +84,5 @@ const RecentTransactions = ({data}) => {
          </div>
     )
 }
+
+export default RecentTransactions;

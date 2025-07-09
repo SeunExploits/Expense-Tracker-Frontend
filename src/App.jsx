@@ -1,10 +1,10 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import SignIn from './pages/auth/sign-in';
 import SignUp from './pages/auth/sign-up';
-import Dashboard from './pages/auth/dashboard';
-import Settings from './pages/auth/settings';
-import AccountPage from './pages/auth/account-page';
-import Transactions from './pages/auth/transactions';
+import Dashboard from './pages/dashboard';
+import Settings from './pages/settings';
+import AccountPage from './pages/account-page';
+import Transactions from './pages/transactions';
 import useStore from './store';
 import { Toaster } from 'sonner';
 import { setAuthToken } from './libs/apiCall';

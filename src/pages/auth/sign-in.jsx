@@ -1,143 +1,98 @@
-import React, { useEffect, useState } from 'react'
-import {zodResolver} from "@hookform/resolvers/zod";
-import useStore from '../../store';
-import { useForm } from 'react-hook-form';
-import * as z from "zod";
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
-import { SocialAuth } from '../../components/social-auth';
-import Separator from '../../components/separator';
-import Input from '../../components/ui/input';
-import { Button } from '../../components/ui/button';
-import { BiLoader } from "react-icons/bi"
-import api from '../../libs/apiCall';
-import { toast } from 'sonner';
-
-const LoginSchema = z.object({
-  email: z
-.string({ required_error: "Email is required"})
-.email({message: "Invalid email address"}),
-password: z
-.string({required_error: "Password is required"})
-.min(10, "Password is required"),
-});
-
-
-
+import Button from "../../components/button";
+import InputField from "../../components/textfield";
+import useStore from "../../store";
+import loading from "../../components/loading";
+import { toast } from "sonner";
+import api from "../../libs/apiCall";
 
 const SignIn = () => {
-  const { user, setCredentials }  = useStore(state=> state)
+  const { user, setCredentials } = useStore((state) => state);
+
   const {
     register,
     handleSubmit,
-    formState: {errors},
-  } = useForm({
-    resolver: zodResolver(LoginSchema),
-  });
+    formState: { errors },
+  } = useForm();
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(()=> {
-    user && navigate("/");
-  }, [user]);
-
-  const onSubmit = async (data) => {
-         try {
+  const submitHandler = async (data) => {
+    try {
       setLoading(true);
-
       const { data: res } = await api.post("/auth/sign-in", data);
-
 
       if (res?.user) {
         toast.success(res?.message);
-
-        const userInfo = {...res?.user, token: res.token}
+        const userInfo = { ...res?.user, token: res?.token };
         localStorage.setItem("user", JSON.stringify(userInfo));
 
         setCredentials(userInfo);
 
         setTimeout(() => {
-          navigate("/overview");
+          navigate("/");
         }, 1500);
-       }
-      } catch (error) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || error.message);
-      } finally {
-        setLoading(false);
       }
+    } catch (error) {
+      console.error("Something went wrong:", error);
+      toast.error(error?.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  
-return (
-    <div className='flex items-center justify-center w-full min-h-screen py-10'> 
-       <Card className= "w-[400px] bg-white dark:bg-black/20 shadow-md overflow-hidden">
-        <div className='p-6 md:8'>
-          <CardHeader className = "py-0">
-            <CardTitle className="mb-8 text-center dark:text-white"> 
-              Sign In
-         </CardTitle>
-        </CardHeader>
+  useEffect(() => {
+    user && navigate("/");
+  }, [user]);
 
-        <CardContent className="p-0">
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-<div className='mb-8 space-y-6'>
-  <SocialAuth isLoading={loading}setLoading= {setLoading}/>
-  <Separator/>
+  return (
+    <div className='flex justify-center items-center h-screen'>
+      <div className='max-w-md w-full bg-white dark:bg-black/20 shadow-md rounded px-8 pt-6 pb-8'>
+        <h2 className='text-2xl mb-6 dark:text-white font-semibold'>Sign In</h2>
+        <form onSubmit={handleSubmit(submitHandler)}>
+          <InputField
+            type='email'
+            name='email'
+            label='Email Address'
+            placeholder='seun7674@gmail.com'
+            register={register("email", {
+              required: "Email Address is required!",
+            })}
+            error={errors.email ? errors.email.message : ""}
+          />
 
-  <Input
-  disabled={loading}
-  id="email"
-  label="Email"
-  type="email"
-  placeholder="me@example.com"
-  error={errors.email?.message}
-  {...register("email")}
-  className="text-sm border dark:border-gray-800 dark:bg-transparent dark:placeholder:text-gray-700"
-  />
+          <InputField
+            type='password'
+            name='password'
+            label='Password'
+            placeholder='Password'
+            register={register("password", {
+              required: "Password is required!",
+            })}
+            error={errors.password ? errors.password.message : ""}
+          />
 
-  <Input
-  disabled={loading}
-  id="password"
-  label="Password"
-  type="password"
-  placeholder="Your Password"
-  error={errors.password?.message}
-  {...register("password")}
-  className="text-sm border dark:border-gray-800 dark:bg-transparent dark:placeholder:text-gray-700"
-  />
-
-</div>
-
-{/* Call the button */}
-    <Button
-    type="submit"
-    className="w-full bg-violet-800"
-    disabled={loading}
-    >
-      {loading ? ( <BiLoader className="text-2xl text-white animate-spin"/>
-      ) : ( 
-        "Sign in"
-      )}
-</Button>
-
-          </form>
-        </CardContent>
-        </div>
-
-        <CardFooter className="justify-center gap-2">
-          <p className='text-sm text-gray-600'>Don't have an account</p>
-          <Link
-          to= "/sign-up"
-          className='text-sm font-semibold text-violet-600 hover:underline'
-          >
-            Sign up
-          </Link>
-        </CardFooter>
-       </Card>
-         </div>
+          <div className='w-full mt-8'>
+            <Button
+              loading={loading}
+              type='submit'
+              label='Sign In'
+              className='bg-violet-800 w-full text-white'
+            />
+            <p className='mt-4 text-gray-600 dark:gray-500 text-sm text-center'>
+              Don't have an account ?{" "}
+              <Link to='/sign-up' className='text-violet-600 hover:underline'>
+                Sign Up
+              </Link>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
